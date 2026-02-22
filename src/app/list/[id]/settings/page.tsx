@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Settings } from "lucide-react";
 import { updateList, deleteList } from "@/app/actions";
+import { DeleteListButton } from "@/components/delete-list-button";
 
 interface SettingsPageProps {
   params: Promise<{ id: string }>;
@@ -90,19 +91,7 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
         <p className="text-sm text-gray-500">
           מחיקת הרשימה תמחק את כל השמות שבה. פעולה זו בלתי הפיכה.
         </p>
-        <form action={deleteListWithId}>
-          <button
-            type="submit"
-            className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium"
-            onClick={(e) => {
-              if (!confirm(he.confirmDelete)) {
-                e.preventDefault();
-              }
-            }}
-          >
-            {he.deleteList}
-          </button>
-        </form>
+        <DeleteListButton deleteAction={deleteListWithId} />
       </div>
     </div>
   );

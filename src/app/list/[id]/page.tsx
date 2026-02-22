@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Plus, Settings, Shield, Users, UserPlus } from "lucide-react";
 import { PersonCard } from "@/components/person-card";
 import { JoinListButton } from "@/components/join-list-button";
+import { ShareListButton } from "@/components/share-list-button";
 
 interface ListPageProps {
   params: Promise<{ id: string }>;
@@ -79,6 +80,13 @@ export default async function ListPage({ params }: ListPageProps) {
         </div>
 
         <div className="flex gap-2">
+          {/* Share button */}
+          <ShareListButton
+            listName={list.name}
+            listId={list.id}
+            personCount={list._count.persons}
+          />
+
           {/* Join button for community lists */}
           {list.type === "COMMUNITY" && user && !isOwner && !isMember && (
             <JoinListButton listId={list.id} />

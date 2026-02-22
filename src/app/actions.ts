@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { getOrCreateDbUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { ListType } from "@/generated/prisma";
+import type { ListType } from "@/generated/prisma/client";
 
 // ──────────────────────────────────────────
 // LIST ACTIONS
