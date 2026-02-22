@@ -234,6 +234,7 @@ export async function updatePerson(personId: string, formData: FormData) {
   });
 
   revalidatePath(`/list/${person.listId}`);
+  redirect(`/list/${person.listId}`);
 }
 
 export async function deletePerson(personId: string) {
