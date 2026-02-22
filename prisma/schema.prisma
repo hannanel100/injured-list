@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────
+
+enum ListType {
+  PERSONAL
+  COMMUNITY
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PersonStatus {
+  INJURED
+  SICK
+  RECOVERING
+  HEALED
+}
+
+enum MemberRole {
+  VIEWER
+  CONTRIBUTOR
+  ADMIN
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ──────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────
+
+model User {
+  id          String   @id @default(uuid())
+  clerkId     String   @unique
+  displayName String?
+  createdAt   DateTime @default(now())
+
+  ownedLists     PrayerList[]    @relation("ListOwner")
+  memberships    ListMember[]
+  addedPersons   Person[]        @relation("AddedBy")
+  pendingPersons PendingPerson[] @relation("PendingAddedBy")
+}
+
+model PrayerList {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  type        ListType @default(PERSONAL)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner          User            @relation("ListOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  persons        Person[]
+  members        ListMember[]
+  pendingPersons PendingPerson[]
+
+  @@index([ownerId])
+  @@index([type])
+}
+
+model Person {
+  id         String       @id @default(uuid())
+  firstName  String
+  lastName   String?
+  motherName String
+  gender     Gender
+  status     PersonStatus @default(SICK)
+  injuryDate DateTime?
+  notes      String?
+  createdAt  DateTime     @default(now())
+  listId     String
+  addedById  String
+
+  list    PrayerList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  addedBy User       @relation("AddedBy", fields: [addedById], references: [id])
+
+  @@index([listId])
+}
+
+model ListMember {
+  id       String     @id @default(uuid())
+  userId   String
+  listId   String
+  role     MemberRole @default(VIEWER)
+  joinedAt DateTime   @default(now())
+
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list PrayerList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listId])
+  @@index([listId])
+}
+
+model PendingPerson {
+  id               String           @id @default(uuid())
+  firstName        String
+  lastName         String?
+  motherName       String
+  gender           Gender
+  status           PersonStatus     @default(SICK)
+  injuryDate       DateTime?
+  notes            String?
+  moderationStatus ModerationStatus @default(PENDING)
+  createdAt        DateTime         @default(now())
+  listId           String
+  addedById        String
+
+  list    PrayerList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  addedBy User       @relation("PendingAddedBy", fields: [addedById], references: [id])
+
+  @@index([listId, moderationStatus])
+}
